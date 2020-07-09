@@ -1,6 +1,8 @@
 import java.sql.ResultSet;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.LinkedHashMap;
 
 
 public class StudentDaoImpl implements StudentDao{
@@ -56,6 +58,39 @@ public class StudentDaoImpl implements StudentDao{
 		dbUtil.close();
 		
 		return students;
+	}
+	
+		/**
+	*	查询所有学生的总成绩
+	*
+	*/
+	public Map<String, Double> findTotalScore()throws Exception{
+		// 1、定义查询的sql
+		String sql = 
+		"SELECT st.`student_name`, SUM(sc.`score`) score " + 
+		" FROM yigu_student st, yigu_score sc " + 
+		" WHERE st.`student_id` = sc.`student_id` " + 
+		" GROUP BY st.`student_name` " + 
+		" ORDER BY st.`student_id` ";	
+		
+		System.out.println(sql);
+		
+		ResultSet resultSet = dbUtil.query(sql);
+		
+		// 2、处理查询结果
+		Map<String, Double> totalScores = new LinkedHashMap<String, Double>();
+		String student_name = "";
+		Double score = 0.0;
+		
+		while(resultSet.next()){
+			
+			student_name = resultSet.getString("student_name");
+			score = resultSet.getDouble("score");
+			
+			totalScores.put(student_name,score);
+		}
+		
+		return totalScores;
 	}
 	
 }

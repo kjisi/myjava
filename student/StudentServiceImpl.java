@@ -7,11 +7,11 @@ public class StudentServiceImpl implements StudentService{
 	private StudentDao studentDao = new StudentDaoImpl();
 	
 	/**
-	*	查询所有学生的成绩
+	*	1、查询所有学生的成绩
 	*
 	*/
 	@Override
-	public Map<String, Double> queryStudentScore()throws Exception{
+	public Map<String, Double> queryAllScore()throws Exception{
 		
 		// 1、调用 studentDao 查询所有学生的成绩
 		List<Student> students = studentDao.findAll();
@@ -28,6 +28,16 @@ public class StudentServiceImpl implements StudentService{
 			scores.put(nameAndClass, student.getScore());
 		}
 		return scores;
+	}
+	
+	/**
+	*	2、查询学生的总成绩
+	*
+	*/
+	@Override
+	public Map<String, Double> queryTotalScore()throws Exception{
+		Map<String, Double> totalScores = studentDao.findTotalScore();
+		return totalScores;
 	}
 	
 	
