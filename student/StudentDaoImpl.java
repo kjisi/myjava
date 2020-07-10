@@ -64,6 +64,7 @@ public class StudentDaoImpl implements StudentDao{
 	*	查询所有学生的总成绩
 	*
 	*/
+	@Override
 	public Map<String, Double> findTotalScore()throws Exception{
 		// 1、定义查询的sql
 		String sql = 
@@ -73,7 +74,7 @@ public class StudentDaoImpl implements StudentDao{
 		" GROUP BY st.`student_name` " + 
 		" ORDER BY st.`student_id` ";	
 		
-		System.out.println(sql);
+		// System.out.println(sql);
 		
 		ResultSet resultSet = dbUtil.query(sql);
 		
@@ -92,5 +93,140 @@ public class StudentDaoImpl implements StudentDao{
 		
 		return totalScores;
 	}
+	
+	
+	/**
+	*	3、查询所有学科的总成绩
+	*
+	*/
+	@Override
+	public Map<String, Double> findClassTotalScore()throws Exception{
+		// 1、定义查询的sql
+		String sql = 
+		"SELECT c.`class_name`,SUM(sc.`score`) totalScore " + 
+		" FROM yigu_class c, yigu_score sc " + 
+		" WHERE c.`class_id` = sc.`class_id` " + 
+		" GROUP BY c.`class_name` " + 
+		" ORDER BY c.`class_id` ";	
+		
+		// System.out.println(sql);
+		
+		ResultSet resultSet = dbUtil.query(sql);
+		
+		// 2、处理查询结果
+		Map<String, Double> classTotalScores = new LinkedHashMap<String, Double>();
+		String class_name = "";
+		Double totalScore = 0.0;
+		
+		while(resultSet.next()){
+			
+			class_name = resultSet.getString("class_name");
+			totalScore = resultSet.getDouble("totalScore");
+			
+			classTotalScores.put(class_name,totalScore);
+		}
+		
+		return classTotalScores;
+	}
+	
+	
+		/**
+	*	4、按照学科名查询成绩
+	*
+	*/
+	@Override
+	public List<Student> findByClassName(String className)throws Exception{
+				// 1、定义查询的sql
+		String sql = 
+		"SELECT st.`student_id`,st.`student_name`,c.`class_name`,sc.`score` " +  // 查询项
+		" FROM yigu_student st, yigu_class c, yigu_score sc" +  // 查询的表
+		" WHERE st.`student_id` = sc.`student_id` " +  // 查询条件
+		" AND c.`class_id` = sc.`class_id`" + 
+		" AND c.`class_name` = '" + className +"'";  // 根据课程名查询
+		
+		ResultSet resultSet = dbUtil.query(sql);
+		
+		// 2、处理查询结果 -- 封装到List对象
+		List<Student> students = new ArrayList<Student>() ;
+		while(resultSet.next()){
+			// 2.1、获取学生信息
+			Integer student_id = resultSet.getInt("student_id");
+			String student_name = resultSet.getString("student_name");
+			String class_name = resultSet.getString("class_name");
+			Double score = resultSet.getDouble("score");
+			
+			// 2.2、给student 对象赋值
+			Student student = new Student();
+			
+			student.setStudent_id(student_id);
+			student.setStudent_name(student_name);
+			student.setClass_name(class_name);
+			student.setScore(score);
+			
+			// 2.3、添加到集合 
+			students.add(student);
+		}
+		
+		// 遍历集合，查看结果
+		students.forEach( (Student temp) -> {
+			System.out.println(temp);
+		});
+		System.out.println("--------------------------------------------------------------------------------");
+		
+		// 关闭资源
+		resultSet.close();
+		dbUtil.close();
+		
+		return students;
+	}
+
+	/**
+	* 	5、按照学生姓名查询成绩
+	*/
+	public List<Student> findByStudentName(String studentName) throws Exception{
+		// 1、定义查询的sql
+		String sql = 
+		"SELECT st.`student_id`,st.`student_name`,c.`class_name`,sc.`score` " +  // 查询项
+		" FROM yigu_student st, yigu_class c, yigu_score sc" +  // 查询的表
+		" WHERE st.`student_id` = sc.`student_id` " +  // 查询条件
+		" AND c.`class_id` = sc.`class_id`" + 
+		" AND st.`student_name` = '" + studentName +"'";  // 根据学生名查询
+		
+		ResultSet resultSet = dbUtil.query(sql);
+		
+		// 2、处理查询结果 -- 封装到List对象
+		List<Student> students = new ArrayList<Student>() ;
+		while(resultSet.next()){
+			// 2.1、获取学生信息
+			Integer student_id = resultSet.getInt("student_id");
+			String student_name = resultSet.getString("student_name");
+			String class_name = resultSet.getString("class_name");
+			Double score = resultSet.getDouble("score");
+			
+			// 2.2、给student 对象赋值
+			Student student = new Student();
+			
+			student.setStudent_id(student_id);
+			student.setStudent_name(student_name);
+			student.setClass_name(class_name);
+			student.setScore(score);
+			
+			// 2.3、添加到集合 
+			students.add(student);
+		}
+		
+		// 遍历集合，查看结果
+		students.forEach( (Student temp) -> {
+			System.out.println(temp);
+		});
+		System.out.println("--------------------------------------------------------------------------------");
+		
+		// 关闭资源
+		resultSet.close();
+		dbUtil.close();
+		
+		return students;
+	}
+	
 	
 }
